@@ -44,9 +44,7 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', {
     desc = 'Exit terminal mode'
 })
 
-vim.keymap.set('n', '<C-q>', '<cmd>NvimTreeToggle<CR>', {
-    desc = 'Toggle File Explorer (Ctrl+b)'
-})
+vim.keymap.set('n', '<C-q>', '<cmd>NvimTreeToggle<CR>', {desc = 'Toggle File Explorer (Ctrl+b)'})
 
 vim.keymap.set('v', 'j', 'k', {desc = 'Move up in visual mode'})
 
@@ -76,6 +74,9 @@ end, { desc = "Formatar arquivo via LSP" })
 vim.keymap.set('n', '<leader><leader>', '<cmd>Telescope oldfiles<CR>', { desc = '[ ] Find Recent Files (MRU)' })
 vim.keymap.set('n', '<leader>ff', '<cmd>Telescope find_files<CR>', { desc = '[F]ind [F]iles' })
 
+vim.keymap.set('n', 'k', 'j', { desc = 'Mover para baixo' })
+vim.keymap.set('n', 'j', 'k', { desc = 'Mover para cima' })
+
 vim.api.nvim_create_autocmd({"InsertLeave", "BufLeave", "FocusLost"}, {
     pattern = "*",
     command = "silent! write"
@@ -102,87 +103,113 @@ end ---@diagnostic disable-next-line: undefined-field
 
 vim.opt.rtp:prepend(lazypath)
 
-require('lazy').setup({'tpope/vim-sleuth', {
-    'nvim-tree/nvim-tree.lua',
-    { "nvim-telescope/telescope.nvim", tag = '0.1.5', dependencies = { 'nvim-lua/plenary.nvim' }},
-    version = '*',
-    lazy = false,
-    dependencies = {'nvim-tree/nvim-web-devicons'},
-    config = function()
-        require('nvim-tree').setup {
-            view = {
-                width = 30
-            },
-            renderer = {
-                icons = {
-                    show_only_dir_icons = true
-                }
-            },
-            -- ************************************************************
-            -- * OPÇÕES CHAVE PARA ABRIR NO DIRETÓRIO DO ARQUIVO ATUAL: *
-            -- ************************************************************
+require('lazy').setup({
+    'tpope/vim-sleuth',
+    'matze/vim-move',
+    {
+        'L3MON4D3/LuaSnip',
+        dependencies = { 'rafamadriz/friendly-snippets' },
+    },
+    {
+        'nvim-tree/nvim-tree.lua',
+        version = '*',
+        lazy = false,
+        dependencies = {
+            'nvim-tree/nvim-web-devicons',
+        },
 
-            -- 1. Abre no diretório do buffer atual. Se você usa ':NvimTreeToggle', 
-            --    ele tentará abrir no diretório do arquivo ativo.
-            update_to_buf_dir = {
-                enable = true,
-                auto_open = false -- Certifique-se de que não abra ao iniciar o Neovim
-            },
+        config = function()
+            require('nvim-tree').setup {
+                view = {
+                    width = 30,
+                },
+                renderer = {
+                    icons = {
+                        show = {
+                            folder = true,
+                            file = true,                        },
+                    },
+                },
+                update_focused_file = {
+                    enable = true,
+                    update_root = true,
+                    ignore_list = {},
+                },
 
-            -- 2. Sempre garante que o arquivo atualmente focado esteja visível 
-            --    na tree quando você alterna entre buffers.
-            update_focused_file = {
-                enable = true,
-                update_root = true, -- Muda a raiz da tree para o diretório do arquivo atual (O QUE VOCÊ QUER)
-                ignore_list = {}
-            },
-
-            -- 3. Abre a tree e seleciona o arquivo ativo (útil para mapeamentos)
-            actions = {
-                open_file = {
-                    quit_on_open = true -- Fecha a tree automaticamente ao abrir um arquivo
-                }
-            },
-            git = {
-                enable = true
+                actions = {
+                    open_file = {
+                        quit_on_open = true,
+                    },
+                },
+                git = {
+                    enable = true,
+                },
             }
+        end,
+    },
+    {
+        'numToStr/Comment.nvim',
+        config = function()
+            require('Comment').setup({
+                toggler = {
+                    line = '<leader>cc', 
+                    block = '<leader>cb', 
+                },
 
-            -- Remova ou comente configurações antigas aqui
-        }
-    end
-}, require 'plugins.which-key', require 'plugins.telescope', require 'plugins.treesitter', require 'plugins.lsp',
-                       require 'plugins.conform', require 'plugins.cmp', require 'plugins.theme',
-                       require 'plugins.todo-comments', require 'plugins.mini', require 'plugins.toggleterm',
-                       require 'plugins.oil', require 'plugins.debug', require 'plugins.indent_line',
-                       require 'plugins.autopairs', require 'plugins.harpoon', require 'plugins.zen',
-                       require 'plugins.supermaven', require 'plugins.gitsigns', -- {
---   'github/copilot.vim',
--- },
--- require 'plugins.comment',
--- require 'plugins.laravel',
--- require 'plugins.lint',
-{
-    import = 'custom.plugins'
-}}, {
-    ui = {
-        icons = vim.g.have_nerd_font and {} or {
-            cmd = '⌘',
-            config = '🛠',
-            event = '📅',
-            ft = '📂',
-            init = '⚙',
-            keys = '🗝',
-            plugin = '🔌',
-            runtime = '💻',
-            require = '🌙',
-            source = '📄',
-            start = '🚀',
-            task = '📌',
-            lazy = '💤 '
-        }
-    }
-})
+                opleader = {
+                    line = '<leader>c',
+                    block = '<leader>b',
+                },
+            })
+        end,
+    },
+    {
+        "folke/which-key.nvim",
+        opts = {}, 
+        priority = 1000,
+    },
+    { "nvim-telescope/telescope.nvim", tag = '0.1.5', dependencies = { 'nvim-lua/plenary.nvim' } },
+    require 'plugins.treesitter',
+    require 'plugins.lsp',
+    require 'plugins.conform',
+    require 'plugins.cmp',
+    require 'plugins.theme',
+    require 'plugins.todo-comments',
+    require 'plugins.mini',
+    require 'plugins.toggleterm',
+    require 'plugins.oil',
+    require 'plugins.debug',
+    require 'plugins.indent_line',
+    require 'plugins.autopairs',
+    require 'plugins.harpoon',
+    require 'plugins.zen',
+    require 'plugins.supermaven',
+    require 'plugins.gitsigns',
 
---
--- The line beneath this is called `modeline`. See `:help modeline`
--- vim: ts=2 sts=2 sw=2 et
+    -- {
+    --   'github/copilot.vim',
+    -- },
+    -- require 'plugins.comment',
+    -- require 'plugins.laravel',
+    -- require 'plugins.lint',
+
+    { import = 'custom.plugins' },
+}, {
+        ui = {
+            icons = vim.g.have_nerd_font and {} or {
+                cmd = '⌘',
+                config = '🛠',
+                event = '📅',
+                ft = '📂',
+                init = '⚙',
+                keys = '🗝',
+                plugin = '🔌',
+                runtime = '💻',
+                require = '🌙',
+                source = '📄',
+                start = '🚀',
+                task = '📌',
+                lazy = '💤 ',
+            },
+        },
+    })
