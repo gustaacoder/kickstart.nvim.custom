@@ -148,6 +148,14 @@ require('lazy').setup({
         end,
     },
     {
+        "nvim-pack/nvim-spectre",
+        dependencies = { "nvim-lua/plenary.nvim" },
+        cmd = "Spectre",
+        config = function()
+            require("spectre").setup()
+        end,
+    },
+    {
         'numToStr/Comment.nvim',
         config = function()
             require('Comment').setup({
